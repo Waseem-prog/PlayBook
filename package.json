@@ -2,16 +2,20 @@
   "name": "playbook",
   "private": true,
   "version": "1.0.0",
-  "description": "PlayBook - Connecting Players, Teams & Tournaments (Deliverable 1: frontend)",
+  "description": "PlayBook - Connecting Players, Teams & Tournaments",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api": "node --env-file-if-exists=.env server/index.js"
   },
   "dependencies": {
     "date-fns": "^3.6.0",
+    "express": "^5",
+    "jsonwebtoken": "^9",
     "lucide-react": "^0.460.0",
+    "mongoose": "^8",
     "react": "^18.3.1",
     "react-big-calendar": "^1.15.0",
     "react-dom": "^18.3.1",
