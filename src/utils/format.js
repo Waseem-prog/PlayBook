@@ -10,6 +10,7 @@ export function todayStr(d = new Date()) {
 export function toMinutes(hhmm) {
   if (!/^\d{2}:\d{2}$/.test(hhmm || '')) return NaN;
   const [h, m] = hhmm.split(':').map(Number);
+  if (h > 23 || m > 59) return NaN;
   return h * 60 + m;
 }
 
