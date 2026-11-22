@@ -52,7 +52,7 @@ export default function Login() {
         </button>
       </form>
 
-      <div className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white p-4">
+      {import.meta.env.VITE_PLAYBOOK_DEMO === 'true' && <div className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo accounts</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <button type="button" className="btn-secondary justify-start" onClick={() => setForm(DEMO.student)}>
@@ -63,7 +63,7 @@ export default function Login() {
           </button>
         </div>
         <p className="mt-2 text-xs text-slate-500">Fills in the form; then press Log in.</p>
-      </div>
+      </div>}
 
       <p className="mt-6 text-center text-sm text-slate-600">
         New here?{' '}

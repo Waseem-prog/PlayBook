@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { authApi, usersApi } from '../api';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +12,7 @@ export function AuthProvider({ children }) {
     authApi
       .me()
       .then(setUser)
+      .catch(() => toast.error('Could not check your session. Try refreshing the page.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -37,10 +39,8 @@ export function AuthProvider({ children }) {
     return u;
   }, []);
 
-  const refresh = useCallback(async () => setUser(await authApi.me()), []);
-
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, refresh }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
