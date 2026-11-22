@@ -2,16 +2,15 @@
 
 Web Programming project (BDS-7A), by Anosha Aamer (23L-2633) and Muhammad Waseem (23L-2545). Instructor: Mahhek Tahir.
 
-**Deliverable 1** is the complete, working **frontend** (React). The Express + MongoDB backend arrives in Deliverable 2. Until then the app runs on a mock data layer stored in the browser's `localStorage`, so every feature can be used end to end.
+React frontend with an Express REST API and MongoDB persistence. The server runs the approval, squad, scheduling, booking and inventory rules. Passwords are hashed with scrypt and sessions use an HTTP-only JWT cookie.
 
 ## Run it
 
-```bash
-npm install
-npm run dev
-```
+1. Use Node.js 22 or later and a MongoDB Atlas cluster or a local MongoDB replica set. Transactions are required. For a new local instance, start MongoDB with `mongod --dbpath <data-directory> --replSet rs0 --bind_ip 127.0.0.1`, then run `mongosh --eval "rs.initiate()"` once.
+2. Copy `.env.example` to `.env`. Set `MONGODB_URI` to the database you want to use and set `JWT_SECRET` to a random value of at least 32 bytes. Generate one with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
+3. Run `npm ci`. In one terminal run `npm run api`. In a second terminal run `npm run dev` and open http://localhost:5173. Vite forwards API requests to port 3001.
 
-Open http://localhost:5173. To build for production, run `npm run build`; the output goes to `dist/`.
+Run `npm run build` and then `npm run api` to serve the compiled frontend and API together on port 3001. Use HTTPS when running with `NODE_ENV=production` so the browser can send the secure session cookie.
 
 ### Demo accounts
 
@@ -20,9 +19,7 @@ Open http://localhost:5173. To build for production, run `npm run build`; the ou
 | Student (captain of Thunder FC) | `ali@student.edu` | `student123` |
 | Sports Office (admin) | `admin@playbook.edu` | `admin123` |
 
-Every seeded student (`sara@`, `omar@`, `fatima@`, `usman@` … `@student.edu`) uses `student123`. The login page has buttons that fill in the two main accounts, and you can also register a new student account.
-
-**Reset demo data** (bottom of the sidebar) restores the original sample data.
+The example environment seeds the demo database on first launch and shows the demo buttons. Every seeded student uses `student123`. For a real deployment, use a separate empty database, set both demo flags to `false`, and supply `ADMIN_EMAIL` and `ADMIN_PASSWORD` for the first startup.
 
 ## Features
 
@@ -47,7 +44,7 @@ Every seeded student (`sara@`, `omar@`, `fatima@`, `usman@` … `@student.edu`) 
 
 ```
 src/
-  api/          Mock REST layer (one module per resource) + localStorage db + seed data
+  api/          HTTP clients grouped by resource
   components/   Layout, ProtectedRoute, Modal/Confirm/Review dialogs, cards, Bracket, calendar, UI kit
   context/      AuthContext (current user, login/register/logout)
   hooks/        useAsync (data loading) and useAction (mutations + toasts)
@@ -56,9 +53,14 @@ src/
     student/    Dashboard, Profile, Teams, Players, Opponents, Tournaments, Matches, Booking, Equipment
     admin/      Dashboard, Approval Queue, Tournaments, Matches, Sports, Venues, Equipment Desk, Bookings, Users
   utils/        Date/time formatting helpers
+server/
+  domain/       Server-side business rules and demo seed data
+  app.js        Express authentication and API setup
+  routes.js     REST endpoints
+  store.js      Mongoose collections and transactions
 ```
 
-Each function in `src/api/*.js` is async and mirrors a planned REST endpoint (each one has a comment such as `// POST /api/teams`). Business rules live there too: approvals, squad limits, booking hours and overlaps, venue clashes, stock counts, and bracket progression. In Deliverable 2 each function body becomes an Axios call to the Express API, and the pages stay unchanged.
+MongoDB transactions keep cross-resource changes together and prevent concurrent bookings or equipment loans from bypassing their checks. The store loads the project data within each transaction, which keeps the original rules together for this college-scale application.
 
 **Tech:** React 18, Vite, React Router 6, Tailwind CSS, react-big-calendar, date-fns, lucide-react, react-hot-toast.
 

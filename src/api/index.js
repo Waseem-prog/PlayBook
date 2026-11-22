@@ -1,5 +1,4 @@
-// Single entry point for all data access. Pages import from here so that
-// Deliverable 2 can swap these mock modules for real HTTP calls in one place.
+// Single entry point for the frontend's HTTP API.
 export * as authApi from './auth';
 export * as usersApi from './users';
 export * as sportsApi from './sports';
