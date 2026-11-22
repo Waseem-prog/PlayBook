@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserSearch, Swords, Trophy, CalendarDays, MapPin, Package, UserCircle,
-  ClipboardCheck, Settings2, Building2, BookOpen, Menu, X, LogOut, RotateCcw, Shield,
+  ClipboardCheck, Settings2, Building2, BookOpen, Menu, X, LogOut, Shield,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { adminApi } from '../api';
 import { Avatar } from './ui';
-import { ConfirmDialog } from './Modal';
 import toast from 'react-hot-toast';
 
 const STUDENT_NAV = [
@@ -49,11 +48,10 @@ function Logo() {
 }
 
 export default function Layout() {
-  const { user, logout, refresh } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
   const [badges, setBadges] = useState({});
   const isAdmin = user?.role === 'admin';
   const nav = isAdmin ? ADMIN_NAV : STUDENT_NAV;
@@ -69,16 +67,12 @@ export default function Layout() {
   }, [isAdmin, location.pathname, location.key]);
 
   async function handleLogout() {
-    await logout();
-    navigate('/login');
-  }
-
-  async function handleReset() {
-    await adminApi.resetDemoData();
-    setConfirmReset(false);
-    await refresh();
-    toast.success('Demo data restored');
-    navigate(0);
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      toast.error(error.message);
+    }
   }
 
   const sidebar = (
@@ -112,11 +106,6 @@ export default function Layout() {
           </NavLink>
         ))}
       </nav>
-      <div className="border-t border-slate-200 p-3">
-        <button className="btn-ghost w-full justify-start text-xs" onClick={() => setConfirmReset(true)}>
-          <RotateCcw className="h-4 w-4" /> Reset demo data
-        </button>
-      </div>
     </div>
   );
 
@@ -156,15 +145,6 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <ConfirmDialog
-        open={confirmReset}
-        title="Reset demo data?"
-        message="This restores the original sample teams, matches, tournaments, bookings and loans. Anything you created will be lost."
-        confirmLabel="Reset"
-        danger
-        onConfirm={handleReset}
-        onClose={() => setConfirmReset(false)}
-      />
     </div>
   );
 }
